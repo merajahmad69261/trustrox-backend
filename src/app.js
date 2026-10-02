@@ -10,8 +10,21 @@ const ownerRoutes = require('./routes/ownerRoutes');
 const app = express();
 
 // Global Middleware
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://trustrox-frontend-619c.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+].filter(Boolean);
+
 app.use(cors({
-  origin: '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    return callback(null, true); // Permissive CORS for REST API endpoints
+  },
   credentials: true,
 }));
 app.use(express.json());
